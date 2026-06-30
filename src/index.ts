@@ -337,6 +337,28 @@ app.post('/feed', authenticateJWT({ missingHeaderStatus: 403 }), (req: Authentic
   });
 });
 
+app.post('/feed/:id/like', authenticateJWT({ missingHeaderStatus: 403 }), (req: AuthenticatedRequest, res: Response) => {
+  const commentId = req.params.id;
+  const userId = req.user?.userId;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'invalid_user', message: 'Usuario no identificado.' });
+  }
+
+  const updatedComment = db.toggleCommentLike(commentId, userId);
+  if (!updatedComment) {
+    return res.status(404).json({ error: 'comment_not_found', message: 'Comentario no encontrado.' });
+  }
+
+  // Sincronizar actualización de reacciones en tiempo real
+  io.emit('like_update', updatedComment);
+
+  return res.status(200).json({
+    status: 'success',
+    comment: updatedComment
+  });
+});
+
 // Global error handling middleware (A10:2025 Mitigation)
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('[SERVER ERROR]:', err);

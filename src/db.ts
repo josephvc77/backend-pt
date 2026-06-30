@@ -34,7 +34,8 @@ export const comments: Comment[] = [
       avatar: '/uploads/default-avatar-2.png'
     },
     content: '¡Bienvenidos al nuevo blog en tiempo real! Este sistema está corriendo en Express + Angular 16.',
-    createdAt: new Date(Date.now() - 3600000 * 2).toISOString() // 2 hours ago
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(), // 2 hours ago
+    likes: []
   },
   {
     id: 'c2',
@@ -45,7 +46,8 @@ export const comments: Comment[] = [
       avatar: '/uploads/default-avatar-1.png'
     },
     content: 'Hola Sarah, el sistema de WebSocket ya está activo y sincroniza todos los comentarios en segundos.',
-    createdAt: new Date(Date.now() - 3600000).toISOString() // 1 hour ago
+    createdAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+    likes: []
   }
 ];
 
@@ -98,9 +100,27 @@ export const db = {
         avatar: user.avatar
       },
       content,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      likes: []
     };
     comments.push(newComment);
     return newComment;
+  },
+
+  toggleCommentLike(commentId: string, userId: string): Comment | null {
+    const comment = comments.find(c => c.id === commentId);
+    if (!comment) return null;
+    
+    if (!comment.likes) {
+      comment.likes = [];
+    }
+    
+    const index = comment.likes.indexOf(userId);
+    if (index === -1) {
+      comment.likes.push(userId); // Add user like
+    } else {
+      comment.likes.splice(index, 1); // Remove user like
+    }
+    return comment;
   }
 };

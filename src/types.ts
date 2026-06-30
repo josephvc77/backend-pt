@@ -17,6 +17,7 @@ export interface Comment {
   };
   content: string;
   createdAt: string;
+  likes?: string[];
 }
 
 export interface JWTPayload {
