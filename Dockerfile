@@ -13,7 +13,7 @@ FROM node:18-alpine
 RUN apk update && apk upgrade --no-cache
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --only=production
+RUN npm install --only=production && rm -f package-lock.json
 COPY --from=builder /app/dist ./dist
 # Create uploads directory and place default avatars
 RUN mkdir -p uploads
