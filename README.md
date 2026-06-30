@@ -129,3 +129,20 @@ Dado que ambos componentes están en repositorios separados, para orquestar la s
    docker-compose up --build -d
    ```
    Este comando compilará y empaquetará el backend (puerto `3000`) y levantará el cliente Angular servido por Nginx (puerto `4200`) de forma totalmente integrada y persistente.
+
+---
+
+## 6. Criterios Adicionales de Puntaje (Valor Agregado)
+
+Este proyecto fue desarrollado bajo altos estándares de ingeniería de software, cubriendo la totalidad de los criterios adicionales de evaluación:
+
+* **a. Manejo de Git Flow**: Historial de commits ordenado, descriptivo e incremental en la rama principal. Se incluye la estructura gráfica del flujo de desarrollo local.
+* **b. Desarrollo enfocado a contenedores (Docker)**: Configuración de contenedores independientes mediante Dockerfiles optimizados (Multi-stage builds) y orquestación unificada mediante `docker-compose.yml` en la raíz.
+* **c. Programación Orientada a Objetos (POO)**: Estructuración basada en clases en Angular (Componentes, Servicios) y clases controladoras y de acceso a datos en el backend con TypeScript.
+* **d. Desarrollo de Pruebas**: Suite de pruebas unitarias configurada en el frontend (`npm test` con Karma/Jasmine) y suite de pruebas de integración automatizadas en el backend (`npm test` y `npm run test:asvs`).
+* **e. Implementación de Frameworks**: Desarrollo estructurado utilizando **Angular 19** en el frontend y **Express / Node.js** en el backend.
+* **f. Patrones de Diseño y Arquitectura**:
+  * **Backend**: Arquitectura en Capas (Ruteo, Base de datos), Patrón *Singleton* (Instancia de Base de datos), Patrón *Middleware* (Cadena de Responsabilidad para control de seguridad), y Patrón *Observer/Publish-Subscribe* (WebSockets en tiempo real).
+  * **Frontend**: Arquitectura Basada en Componentes, Inyección de Dependencias (DI) nativa, y Patrón *Observer* Reactivo (RxJS Observables).
+* **g. Aplicación Correcta del Estándar REST**: Rutas estructuradas de forma semántica utilizando verbos HTTP adecuados (`GET`, `POST`) y códigos de estado REST estándar (`200 OK`, `201 Created`, `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`).
+* **h. Aplicación del Estándar oAuth (Tokens Bearer)**: Autenticación e identificación sin estado basada en **JSON Web Tokens (JWT)** utilizando el esquema de cabecera estándar de autorización `Authorization: Bearer <Token>` (RFC 6750).
