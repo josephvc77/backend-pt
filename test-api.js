@@ -82,6 +82,19 @@ async function runTests() {
       console.error('   ↳ Redirección ausente en la respuesta:', registerData);
     }
 
+    // a2. Registro correcto sin enviar archivo de avatar (debe tomar avatar por defecto)
+    const registerNoAvatarForm = new FormData();
+    registerNoAvatarForm.append('name', 'Maria Gomez');
+    registerNoAvatarForm.append('email', 'maria@example.com');
+    registerNoAvatarForm.append('username', 'maria');
+    registerNoAvatarForm.append('password', 'password123');
+
+    let registerNoAvatarOk = await fetch(`${BASE_URL}/register`, {
+      method: 'POST',
+      body: registerNoAvatarForm
+    });
+    assertStatus('/register - Registro correcto sin avatar (Opcional)', registerNoAvatarOk, 201);
+
     // b. Proporcionando datos No válidos (Números en el nombre, correo sin estructura, etc)
     const badRegForm1 = new FormData();
     badRegForm1.append('name', 'Roberto123'); // Invalid name

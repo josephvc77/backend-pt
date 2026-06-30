@@ -148,26 +148,27 @@ app.post('/login', (req: Request, res: Response) => {
 // ==========================================
 // 2. ENDPOINT: /register
 // ==========================================
-// Supporting single file upload under 'avatar' key
+// Supporting single file upload under 'avatar' key (optional)
 app.post('/register', upload.single('avatar'), (req: Request, res: Response) => {
   const { name, email, username, password } = req.body;
   const avatarFile = req.file;
 
-  // Validation: Missing fields (all fields are required)
-  if (!name || !email || !username || !password || !avatarFile) {
-    // If a file was uploaded but validation failed, clean it up
+  // Validation: Missing fields (all text fields are required)
+  if (!name || !email || !username || !password) {
     if (avatarFile) {
       safeUnlink(avatarFile.path);
     }
     return res.status(400).json({
       error: 'missing_fields',
-      message: 'Todos los datos (Nombre, Correo, Usuario, Contraseña y Foto de perfil) son obligatorios.'
+      message: 'Nombre, Correo, Usuario y Contraseña son campos obligatorios.'
     });
   }
 
   // Validation: Name cannot contain numbers
   if (/\d/.test(name)) {
-    safeUnlink(avatarFile.path);
+    if (avatarFile) {
+      safeUnlink(avatarFile.path);
+    }
     return res.status(400).json({
       error: 'invalid_name',
       message: 'El nombre no puede contener números.'
@@ -177,7 +178,9 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
   // Validation: Email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    safeUnlink(avatarFile.path);
+    if (avatarFile) {
+      safeUnlink(avatarFile.path);
+    }
     return res.status(400).json({
       error: 'invalid_email',
       message: 'El correo electrónico no tiene un formato válido.'
@@ -186,7 +189,9 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
 
   // Validation: Username already exists
   if (db.findUserByUsername(username)) {
-    safeUnlink(avatarFile.path);
+    if (avatarFile) {
+      safeUnlink(avatarFile.path);
+    }
     return res.status(400).json({
       error: 'username_taken',
       message: 'El nombre de usuario ya está registrado.'
@@ -195,7 +200,9 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
 
   // Validation: Email already exists
   if (db.findUserByEmail(email)) {
-    safeUnlink(avatarFile.path);
+    if (avatarFile) {
+      safeUnlink(avatarFile.path);
+    }
     return res.status(400).json({
       error: 'email_taken',
       message: 'El correo electrónico ya está registrado.'
@@ -204,7 +211,9 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
 
   // Hash password
   const hashedPassword = bcrypt.hashSync(password, 10);
-  const avatarUrl = `/uploads/${avatarFile.filename}`;
+  
+  // Use uploaded avatar path if provided, otherwise default to avatar placeholder
+  const avatarUrl = avatarFile ? `/uploads/${avatarFile.filename}` : '/uploads/default-avatar-1.png';
 
   // Save user in-memory
   db.createUser({
