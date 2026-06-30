@@ -153,14 +153,23 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
   const { name, email, username, password } = req.body;
   const avatarFile = req.file;
 
-  // Validation: Missing fields (all text fields are required)
-  if (!name || !email || !username || !password) {
+  // Validation: Missing fields and strict type checks (OWASP ASVS / Improper Type Validation Mitigation)
+  if (
+    typeof name !== 'string' ||
+    typeof email !== 'string' ||
+    typeof username !== 'string' ||
+    typeof password !== 'string' ||
+    name.trim() === '' ||
+    email.trim() === '' ||
+    username.trim() === '' ||
+    password.trim() === ''
+  ) {
     if (avatarFile) {
       safeUnlink(avatarFile.path);
     }
     return res.status(400).json({
       error: 'missing_fields',
-      message: 'Nombre, Correo, Usuario y Contraseña son campos obligatorios.'
+      message: 'Nombre, Correo, Usuario y Contraseña son obligatorios y deben ser cadenas de texto.'
     });
   }
 
@@ -210,7 +219,7 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
   }
 
   // Validation: Password complexity (ASVS V2 compliance)
-  if (password.length < 6) {
+  if (typeof password !== 'string' || password.length < 6) {
     if (avatarFile) {
       safeUnlink(avatarFile.path);
     }
