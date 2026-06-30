@@ -209,6 +209,17 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
     });
   }
 
+  // Validation: Password complexity (ASVS V2 compliance)
+  if (password.length < 6) {
+    if (avatarFile) {
+      safeUnlink(avatarFile.path);
+    }
+    return res.status(400).json({
+      error: 'weak_password',
+      message: 'La contraseña debe tener al menos 6 caracteres.'
+    });
+  }
+
   // Hash password
   const hashedPassword = bcrypt.hashSync(password, 10);
   
