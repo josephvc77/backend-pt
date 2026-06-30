@@ -1,0 +1,9 @@
+# Snyk (https://snyk.io) policy file
+version: v1.25.0
+exclude:
+  global:
+    - node_modules/
+    - test-api.js
+    - security-scan.js
+    - asvs-verify.js
+    - src/test-units.ts
