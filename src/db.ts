@@ -33,7 +33,7 @@ export const comments: Comment[] = [
       username: 'sarah',
       avatar: '/uploads/default-avatar-2.png'
     },
-    content: '¡Bienvenidos al nuevo blog en tiempo real! Este sistema está corriendo en Express + Angular 19.',
+    content: '¡Bienvenidos al nuevo blog en tiempo real! Este sistema está corriendo con Node.js, Express + Angular 19.',
     createdAt: new Date(Date.now() - 3600000 * 2).toISOString(), // 2 hours ago
     likes: []
   },
