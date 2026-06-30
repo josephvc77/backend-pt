@@ -79,7 +79,7 @@ npm test
 El proyecto está diseñado y optimizado para ejecutarse en contenedores mediante un flujo **multi-stage build** en Docker.
 
 ### A. Ejecución Individual del Contenedor de Backend
-Si deseas construir y ejecutar únicamente la API de backend:
+Si deseas construir y ejecutar únicamente la API de backend de manera independiente:
 
 1. **Construir la imagen de Docker**:
    ```bash
@@ -91,15 +91,41 @@ Si deseas construir y ejecutar únicamente la API de backend:
    ```
    *(Esto levantará la API en el puerto 3000 de tu máquina).*
 
-### B. Orquestación Completa (Backend + Frontend)
-En el directorio raíz del proyecto se incluye un archivo `docker-compose.yml` para levantar la solución completa con un solo comando.
+### B. Orquestación Completa de la Solución (Backend + Frontend)
+Dado que ambos componentes están en repositorios separados, para orquestar la solución completa con Docker Compose debes:
 
-Desde la carpeta raíz del proyecto, ejecuta:
-```bash
-docker-compose up --build -d
-```
+1. Clonar ambos repositorios como carpetas hermanas dentro de un mismo directorio raíz:
+   ```text
+   mi-proyecto/
+   ├── backend/   (Clonado de: https://github.com/josephvc77/prueba-te-cnica-desarrollo-web-backend)
+   └── frontend/  (Clonado de: https://github.com/josephvc77/Prueba-te-cnica-desarrollo-web-frontend)
+   ```
+2. Crear un archivo llamado `docker-compose.yml` dentro del directorio raíz (`mi-proyecto/`) con el siguiente contenido:
+   ```yaml
+   version: '3.8'
 
-Este comando:
-1. Compilará y empaquetará el backend (puerto `3000`).
-2. Compilará y servirá el frontend mediante Nginx (puerto `4200` apuntando internamente al puerto `80`).
-3. Creará un volumen compartido seguro para gestionar las imágenes de avatar cargadas de forma persistente.
+   services:
+     backend:
+       build: ./backend
+       ports:
+         - "3000:3000"
+       volumes:
+         - backend-uploads:/app/uploads
+       environment:
+         - PORT=3000
+
+     frontend:
+       build: ./frontend
+       ports:
+         - "4200:80"
+       depends_on:
+         - backend
+
+   volumes:
+     backend-uploads:
+   ```
+3. Desde la carpeta raíz del proyecto (`mi-proyecto/`), ejecuta:
+   ```bash
+   docker-compose up --build -d
+   ```
+   Este comando compilará y empaquetará el backend (puerto `3000`) y levantará el cliente Angular servido por Nginx (puerto `4200`) de forma totalmente integrada y persistente.
