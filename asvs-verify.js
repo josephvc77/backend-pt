@@ -25,7 +25,9 @@ async function runAsvsSuite() {
     // -------------------------------------------------------------
     // V1: Arquitectura, Diseño y Modelado de Amenazas
     // -------------------------------------------------------------
-    const hasFront = fs.existsSync(path.join(__dirname, '../frontend'));
+    const hasFront = fs.existsSync(path.join(__dirname, '../frontend')) ||
+                     fs.existsSync(path.join(__dirname, '../Prueba-te-cnica-desarrollo-web-frontend')) ||
+                     fs.existsSync(path.join(__dirname, '../prueba-te-cnica-desarrollo-web-frontend'));
     const hasBack = fs.existsSync(path.join(__dirname, 'package.json'));
     printResult('V1', 'Segregación de Capas', hasFront && hasBack, 'Frontend y Backend modularizados de forma independiente.');
 
