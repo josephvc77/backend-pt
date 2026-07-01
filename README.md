@@ -7,7 +7,7 @@ Este repositorio contiene la API REST para la plataforma Tech Blog, desarrollada
 ## Requisitos Previos
 
 Asegúrate de tener instalados los siguientes componentes:
-* **Node.js**: Versión 18 o superior (probado en Node.js `v18.20.5`)
+* **Node.js**: Versión 22 o superior (probado en Node.js `v22.22.3`)
 * **npm**: Gestor de paquetes integrado con Node.js
 * **Docker y Docker Compose**: Para ejecución basada en contenedores.
 
@@ -97,8 +97,8 @@ Dado que ambos componentes están en repositorios separados, para orquestar la s
 1. Clonar ambos repositorios como carpetas hermanas dentro de un mismo directorio raíz:
    ```text
    mi-proyecto/
-   ├── backend/   (Clonado de: https://github.com/josephvc77/prueba-te-cnica-desarrollo-web-backend)
-   └── frontend/  (Clonado de: https://github.com/josephvc77/Prueba-te-cnica-desarrollo-web-frontend)
+    ├── backend/   (Clonado de: https://github.com/josephvc77/backend-pt)
+    └── frontend/  (Clonado de: https://github.com/josephvc77/frontend-pt)
    ```
 2. Crear un archivo llamado `docker-compose.yml` dentro del directorio raíz (`mi-proyecto/`) con el siguiente contenido:
    ```yaml
@@ -140,7 +140,7 @@ Este proyecto fue desarrollado bajo altos estándares de ingeniería de software
 * **b. Desarrollo enfocado a contenedores (Docker)**: Configuración de contenedores independientes mediante Dockerfiles optimizados (Multi-stage builds) y orquestación unificada mediante `docker-compose.yml` en la raíz.
 * **c. Programación Orientada a Objetos (POO)**: Estructuración basada en clases en Angular (Componentes, Servicios) y clases controladoras y de acceso a datos en el backend con TypeScript.
 * **d. Desarrollo de Pruebas**: Suite de pruebas unitarias configurada en el frontend (`npm test` con Karma/Jasmine) y suite de pruebas de integración automatizadas en el backend (`npm test` y `npm run test:asvs`).
-* **e. Implementación de Frameworks**: Desarrollo estructurado utilizando **Angular 19** en el frontend y **Express / Node.js** en el backend.
+* **e. Implementación de Frameworks**: Desarrollo estructurado utilizando **Angular 20** en el frontend y **Express / Node.js** en el backend.
 * **f. Patrones de Diseño y Arquitectura**:
   * **Backend**: Arquitectura en Capas (Ruteo, Base de datos), Patrón *Singleton* (Instancia de Base de datos), Patrón *Middleware* (Cadena de Responsabilidad para control de seguridad), y Patrón *Observer/Publish-Subscribe* (WebSockets en tiempo real).
   * **Frontend**: Arquitectura Basada en Componentes, Inyección de Dependencias (DI) nativa, y Patrón *Observer* Reactivo (RxJS Observables).
