@@ -44,7 +44,7 @@ El ASVS de OWASP es un estándar de seguridad abierto que establece la cobertura
 
 | Sección ASVS | Control de Seguridad (Nivel 2) | Implementación y Evidencia en la Aplicación |
 | :--- | :--- | :--- |
-| **V1: Arquitectura, Diseño y Modelado de Amenazas** | Segregación modular de servicios, diseño seguro de API y modelado de fronteras de confianza. | **CUMPLE**: Arquitectura desacoplada (Frontend en Angular 19, Backend en Express/TypeScript) que delimita claramente las interacciones. |
+| **V1: Arquitectura, Diseño y Modelado de Amenazas** | Segregación modular de servicios, diseño seguro de API y modelado de fronteras de confianza. | **CUMPLE**: Arquitectura desacoplada (Frontend en Angular 20, Backend en Express/TypeScript) que delimita claramente las interacciones. |
 | **V2: Autenticación** | Validar contraseñas de al menos 6 caracteres, validar formatos y usar funciones de hash lento. | **CUMPLE**: Formulario reactivo y API de backend validan longitud mínima de 6 caracteres. Hashing de contraseñas mediante Bcrypt. |
 | **V3: Gestión de Sesiones** | Emplear identificadores de sesión aleatorios y con tiempo de vida limitado. | **CUMPLE**: Tokens JWT firmados con HMAC-SHA256, con tiempo de expiración (1 hora) y destrucción de localStorage al hacer logout. |
 | **V4: Control de Acceso** | Validar el principio de mínimo privilegio en el servidor para cada recurso protegido. | **CUMPLE**: Middleware de autorización JWT protege de forma autónoma los endpoints `/me`, `/feed` y `/change-password`. |
@@ -88,8 +88,8 @@ Se realizó el análisis de dependencias mediante Snyk y el motor de auditoría 
   * *Resultado*: **0 vulnerabilidades encontradas** (tanto críticas como generales) en todas las librerías de ejecución.
   * *Estatus*: **100% Limpio (Clean)**.
 * **Frontend (`frontend/`)**:
-  * *Acción*: Se actualizó la pila del proyecto de Angular 16.2.12 a **Angular 19.2.25** para mitigar la vulnerabilidad crítica de hashing en cache (`SNYK-JS-ANGULARCOMMON-17356555`).
-  * *Resultado*: **0 vulnerabilidades CRÍTICAS** presentes en los paquetes del cliente. Las dependencias remanentes corresponden a advertencias de desarrollo (build tools) sin impacto en el bundle de producción final.
+  * *Acción*: Se actualizó la pila del proyecto de Angular 16.2.12 a **Angular 20.3.25** para mitigar la vulnerabilidad de hashing en cache (`SNYK-JS-ANGULARCOMMON-17356555`) y la vulnerabilidad crítica de envenenamiento de caché (`GHSA-rgjc-h3x7-9mwg` / `CVE-2026-54267`).
+  * *Resultado*: **0 vulnerabilidades CRÍTICAS** presentes en los paquetes del cliente en producción. Las dependencias remanentes corresponden a advertencias de desarrollo (build tools) sin impacto en el bundle de producción final.
 
 ### III. Resultados del Análisis de Código Fuente (Snyk Code SAST)
 Se ejecutó el análisis estático de seguridad sobre el código fuente propio mediante el motor de Snyk Code (`snyk code test`), logrando mitigar todos los hallazgos:
@@ -102,7 +102,7 @@ Se ejecutó el análisis estático de seguridad sobre el código fuente propio m
   * *Resultado*: **0 Vulnerabilidades encontradas (0 open issues)**.
   * *Estatus*: **100% Aprobado**.
 * **Frontend (`frontend/`)**:
-  * *Remediación*: Se resolvió la incompatibilidad de bloques de control de Angular 19 escapando caracteres `@` y se definieron componentes con directiva modular.
+  * *Remediación*: Se resolvió la incompatibilidad de bloques de control de Angular 20 escapando caracteres `@` y se definieron componentes con directiva modular.
   * *Resultado*: **0 Vulnerabilidades encontradas (0 open issues)**.
   * *Estatus*: **100% Aprobado**.
 
@@ -164,7 +164,7 @@ De acuerdo con las pautas de FIRST.Org (propietario de CVSS), a continuación se
 | **Bypass de Autorización** | 8.2 (Alta) | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:L/A:N` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N` | Ninguna | Mitigado (Middleware de Express y Guards de Angular) |
 | **JWT Signature Tampering** | 9.8 (Crítica) | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N` | Ninguna | Mitigado (Firma HMAC-SHA256 validada estrictamente) |
 | **JWT None Algorithm Bypass** | 9.8 (Crítica) | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N` | Ninguna | Mitigado (Algoritmo explícito verificado en el servidor) |
-| **Stored XSS en Comentarios** | 6.1 (Media) | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:N/A:N` | Ninguna | Mitigado (HTML escapado nativamente por Angular 19) |
+| **Stored XSS en Comentarios** | 6.1 (Media) | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:N/A:N` | Ninguna | Mitigado (HTML escapado nativamente por Angular 20) |
 | **DOS por subida de archivos (Multer)** | 7.5 (Alta) | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N` | Ninguna | Mitigado (Límite físico de 2MB y borrado de temporales) |
 | **Paquetes `devDependencies` (Local dev)** | 3.6 (Baja) | `CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N` | 3.6 | `CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N` | Baja | Aceptable (Fuera del bundle, sólo en entorno local) |
 
