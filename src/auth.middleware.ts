@@ -13,7 +13,7 @@ export const authenticateJWT = (options: { missingHeaderStatus: 400 | 403 }) => 
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
 
-    // Check if the header exists
+    // Verificar si la cabecera existe
     if (!authHeader) {
       console.warn(`[CONTROL DE ACCESO] Intento de acceso sin cabeceras en ruta: ${req.originalUrl} (IP: ${req.ip})`);
       return res.status(options.missingHeaderStatus).json({
@@ -22,7 +22,7 @@ export const authenticateJWT = (options: { missingHeaderStatus: 400 | 403 }) => 
       });
     }
 
-    // Check header structure: 'Bearer <token>'
+    // Verificar la estructura de la cabecera: 'Bearer <token>'
     const parts = authHeader.split(' ');
     if (parts.length !== 2 || parts[0] !== 'Bearer') {
       console.warn(`[CONTROL DE ACCESO] Formato de cabecera inválido en ruta: ${req.originalUrl} (IP: ${req.ip})`);

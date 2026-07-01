@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   username: string;
-  password?: string; // Optional so we can delete it before sending to the client
+  password?: string; // Opcional para poder eliminarlo antes de enviarlo al cliente
   avatar: string;
 }
 

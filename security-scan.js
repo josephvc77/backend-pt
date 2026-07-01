@@ -1,6 +1,6 @@
 const { spawn } = require('child_process');
 
-const BACKEND_PORT = 3001; // Run on a separate port for isolation
+const BACKEND_PORT = 3001; // Ejecutar en un puerto separado para aislamiento
 const BASE_URL = `http://localhost:${BACKEND_PORT}`;
 
 async function runSecurityTests() {
@@ -39,7 +39,7 @@ async function runSecurityTests() {
     // -------------------------------------------------------------
     // TEST 2: Alteración de Firma JWT (JWT Signature Tampering)
     // -------------------------------------------------------------
-    // Get a valid token first
+    // Obtener un token válido primero
     let loginOk = await fetch(`${BASE_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -47,7 +47,7 @@ async function runSecurityTests() {
     });
     const { access_token } = await loginOk.json();
     
-    // Modify the signature portion of the JWT (3rd part)
+    // Modificar la parte de la firma del JWT (tercera parte)
     const tokenParts = access_token.split('.');
     const tamperedToken = `${tokenParts[0]}.${tokenParts[1]}.fakesignature12345`;
 
@@ -60,9 +60,9 @@ async function runSecurityTests() {
     // -------------------------------------------------------------
     // TEST 3: Algoritmo "None" en JWT (JWT None Algorithm Bypass)
     // -------------------------------------------------------------
-    // Construct header specifying "none" algorithm: {"alg":"none","typ":"JWT"} -> base64
+    // Construir cabecera especificando el algoritmo "none": {"alg":"none","typ":"JWT"} -> base64
     const noneHeader = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url');
-    // Payload from token
+    // Carga útil del token
     const payload = tokenParts[1];
     const noneToken = `${noneHeader}.${payload}.`;
 
@@ -93,7 +93,7 @@ async function runSecurityTests() {
     // -------------------------------------------------------------
     let badHeaderRes = await fetch(`${BASE_URL}/me`, {
       method: 'GET',
-      headers: { 'Authorization': `Basic YWRtaW46cGFzc3dvcmQ=` } // Basic instead of Bearer
+      headers: { 'Authorization': `Basic YWRtaW46cGFzc3dvcmQ=` } // Basic en lugar de Bearer
     });
     assertBlocked('Cabecera malformada (Basic Schema) en /me', badHeaderRes, 401);
 
@@ -108,7 +108,7 @@ async function runSecurityTests() {
       },
       body: JSON.stringify({ content: '<script>alert("XSS Stored Test")</script>' })
     });
-    // Server should store the string safely (plain text) and return 200 (not execute or crash)
+    // El servidor debe almacenar la cadena de forma segura (texto plano) y devolver 200 (no ejecutar ni fallar)
     if (postXssRes.status === 200) {
       console.log(' [SEGURO] XSS Stored - Servidor almacena el comentario como string plano de forma segura.');
     } else {
@@ -129,7 +129,7 @@ async function runSecurityTests() {
   }
 }
 
-// Start backend server
+// Iniciar el servidor backend
 console.log('Arrancando el servidor backend en modo sandbox para pruebas de penetración...');
 const serverProcess = spawn('npx', ['ts-node', 'src/index.ts'], {
   cwd: __dirname,
@@ -150,5 +150,5 @@ serverProcess.stdout.on('data', async (data) => {
 });
 
 serverProcess.stderr.on('data', (data) => {
-  // Suppress verbose error logging during scans to keep output clean
+  // Suprimir el registro detallado de errores durante los escaneos para mantener la salida limpia
 });

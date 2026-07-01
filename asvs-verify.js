@@ -2,7 +2,7 @@ const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const BACKEND_PORT = 3002; // Isolated port for testing
+const BACKEND_PORT = 3002; // Puerto aislado para pruebas
 const BASE_URL = `http://localhost:${BACKEND_PORT}`;
 
 async function runAsvsSuite() {
@@ -85,7 +85,7 @@ async function runAsvsSuite() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        name: 'Roberto123', // Name with numbers
+        name: 'Roberto123', // Nombre con números
         username: 'roberto1',
         email: 'rober@mail.com',
         password: 'password123'
@@ -96,7 +96,7 @@ async function runAsvsSuite() {
     // -------------------------------------------------------------
     // V6: Criptografía Almacenada
     // -------------------------------------------------------------
-    // Reading raw seed file content or validating Bcrypt hashing logic
+    // Leer el contenido del archivo semilla sin procesar o validar la lógica de hashing de Bcrypt
     const dbFile = fs.readFileSync(path.join(__dirname, 'src/db.ts'), 'utf8');
     const usesBcrypt = dbFile.includes('bcrypt.hashSync') || dbFile.includes('password');
     printResult('V6', 'Hashing de Credenciales', usesBcrypt, 'Contraseñas almacenadas de forma irreversible mediante hashing Bcrypt.');
@@ -104,11 +104,11 @@ async function runAsvsSuite() {
     // -------------------------------------------------------------
     // V7: Manejo de Errores y Registro
     // -------------------------------------------------------------
-    // Send malformed JSON to test the global syntax error middleware
+    // Enviar JSON malformado para probar el middleware global de errores de sintaxis
     let badJsonRes = await fetch(`${BASE_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: '{ "username": "joseph", "password": }' // Invalid JSON syntax
+      body: '{ "username": "joseph", "password": }' // Sintaxis JSON inválida
     });
     const badJsonBody = await badJsonRes.json();
     const errorHandled = badJsonRes.status === 400 && badJsonBody.error === 'bad_request';
@@ -128,7 +128,7 @@ async function runAsvsSuite() {
     // -------------------------------------------------------------
     // V9: Comunicación
     // -------------------------------------------------------------
-    // Check if Helmet's HSTS and X-Content-Type headers are present
+    // Verificar si las cabeceras HSTS y X-Content-Type de Helmet están presentes
     const hstsHeader = meRes.headers.get('strict-transport-security');
     const nosniffHeader = meRes.headers.get('x-content-type-options');
     printResult('V9', 'Protección del Canal (HSTS)', hstsHeader && nosniffHeader === 'nosniff', `Encabezados de transporte seguros inyectados (nosniff: ${nosniffHeader}).`);
@@ -149,7 +149,7 @@ async function runAsvsSuite() {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${access_token}`
       },
-      body: JSON.stringify({ content: '    ' }) // Blank comment
+      body: JSON.stringify({ content: '    ' }) // Comentario en blanco
     });
     printResult('V11', 'Límites Lógicos Comerciales', emptyCommentRes.status === 400, 'Rechazo de publicaciones vacías o espacios en blanco (Status: 400).');
 

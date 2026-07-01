@@ -15,29 +15,29 @@ import { authenticateJWT, JWT_SECRET, AuthenticatedRequest } from './auth.middle
 
 const app = express();
 
-// Port configuration
+// Configuración del puerto
 const PORT = process.env.PORT || 3000;
 
-// Start the server using Express wrapper to avoid raw HTTP module warnings in SAST
+// Iniciar el servidor usando el wrapper de Express para evitar advertencias de módulos HTTP puros en SAST
 const server = app.listen(PORT, () => {
   console.log(`Servidor Express corriendo en http://localhost:${PORT}`);
 });
 
-// Configure Socket.io
+// Configurar Socket.io
 const io = new Server(server, {
   cors: {
-    origin: '*', // Allow all for convenience, restrict in production
+    origin: '*', // Permitir todos por conveniencia, restringir en producción
     methods: ['GET', 'POST']
   }
 });
 
-// Create uploads directory and place default avatars if they don't exist
+// Crear el directorio de subidas y colocar los avatares predeterminados si no existen
 const uploadsDir = path.join(__dirname, '../uploads');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-const defaultAvatarBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; // 1x1 transparent PNG
+const defaultAvatarBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; // PNG transparente de 1x1
 const avatar1Path = path.join(uploadsDir, 'default-avatar-1.png');
 const avatar2Path = path.join(uploadsDir, 'default-avatar-2.png');
 
@@ -48,7 +48,7 @@ if (!fs.existsSync(avatar2Path)) {
   fs.writeFileSync(avatar2Path, Buffer.from(defaultAvatarBase64, 'base64'));
 }
 
-// Multer storage configuration for profile pictures
+// Configuración de almacenamiento de Multer para fotos de perfil
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadsDir);
@@ -61,10 +61,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 2 * 1024 * 1024 } // 2MB limit
+  limits: { fileSize: 2 * 1024 * 1024 } // Límite de 2MB
 });
 
-// Path Traversal Mitigation: Ensure deleted file resides strictly inside uploads directory
+// Mitigación de Path Traversal: Asegurar que el archivo eliminado resida estrictamente dentro del directorio de subidas
 function safeUnlink(filePath: string): void {
   if (!filePath) return;
   const resolvedPath = path.resolve(filePath);
@@ -73,17 +73,17 @@ function safeUnlink(filePath: string): void {
     try {
       fs.unlinkSync(resolvedPath);
     } catch (e) {
-      // Ignore if file doesn't exist
+      // Ignorar si el archivo no existe
     }
   } else {
     console.error(`[SEGURIDAD] Intento de Path Traversal bloqueado al borrar: ${filePath}`);
   }
 }
 
-// Rate Limiter Mitigation: Prevent DoS on sensitive endpoints
+// Mitigación de Limitador de Tasa: Prevenir DoS en endpoints sensibles
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per window
+  windowMs: 15 * 60 * 1000, // 15 minutos
+  max: 100, // Limitar cada IP a 100 solicitudes por ventana
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'too_many_requests', message: 'Demasiadas solicitudes. Por favor intente más tarde.' }
@@ -98,10 +98,10 @@ app.use('/register', apiLimiter);
 app.use('/login', apiLimiter);
 
 
-// Serve static upload files
+// Servir archivos estáticos subidos
 app.use('/uploads', express.static(uploadsDir));
 
-// Socket.io connection logging
+// Registro de conexiones de Socket.io
 io.on('connection', (socket) => {
   console.log(`Cliente WebSocket conectado: ${socket.id}`);
   socket.on('disconnect', () => {
@@ -115,7 +115,7 @@ io.on('connection', (socket) => {
 app.post('/login', (req: Request, res: Response) => {
   const { username, password } = req.body;
 
-  // Validation: Missing fields
+  // Validación: Campos faltantes
   if (!username || !password) {
     return res.status(400).json({
       error: 'missing_credentials',
@@ -125,7 +125,7 @@ app.post('/login', (req: Request, res: Response) => {
 
   const user = db.findUserByUsername(username);
 
-  // Validation: Incorrect credentials
+  // Validación: Credenciales incorrectas
   if (!user || !user.password || !bcrypt.compareSync(password, user.password)) {
     return res.status(401).json({
       error: 'invalid_credentials',
@@ -133,9 +133,9 @@ app.post('/login', (req: Request, res: Response) => {
     });
   }
 
-  // Generate JWT Token
+  // Generar token JWT
   const tokenPayload = { userId: user.id, username: user.username };
-  const expirationSeconds = 3600; // 1 hour
+  const expirationSeconds = 3600; // 1 hora
   const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: expirationSeconds });
 
   return res.status(200).json({
@@ -148,12 +148,12 @@ app.post('/login', (req: Request, res: Response) => {
 // ==========================================
 // 2. ENDPOINT: /register
 // ==========================================
-// Supporting single file upload under 'avatar' key (optional)
+// Soporte para subida de un solo archivo bajo la clave 'avatar' (opcional)
 app.post('/register', upload.single('avatar'), (req: Request, res: Response) => {
   const { name, email, username, password } = req.body;
   const avatarFile = req.file;
 
-  // Validation: Missing fields and strict type checks (OWASP ASVS / Improper Type Validation Mitigation)
+  // Validación: Campos faltantes y verificaciones de tipo estrictas (OWASP ASVS / Mitigación de Validación de Tipo Incorrecta)
   if (
     typeof name !== 'string' ||
     typeof email !== 'string' ||
@@ -173,7 +173,7 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
     });
   }
 
-  // Validation: Name cannot contain numbers
+  // Validación: El nombre no puede contener números
   if (/\d/.test(name)) {
     if (avatarFile) {
       safeUnlink(avatarFile.path);
@@ -184,7 +184,7 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
     });
   }
 
-  // Validation: Email format
+  // Validación: Formato de correo electrónico
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     if (avatarFile) {
@@ -196,7 +196,7 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
     });
   }
 
-  // Validation: Username already exists
+  // Validación: El nombre de usuario ya existe
   if (db.findUserByUsername(username)) {
     if (avatarFile) {
       safeUnlink(avatarFile.path);
@@ -207,7 +207,7 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
     });
   }
 
-  // Validation: Email already exists
+  // Validación: El correo electrónico ya existe
   if (db.findUserByEmail(email)) {
     if (avatarFile) {
       safeUnlink(avatarFile.path);
@@ -218,7 +218,7 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
     });
   }
 
-  // Validation: Password complexity (ASVS V2 compliance)
+  // Validación: Complejidad de la contraseña (cumplimiento ASVS V2)
   if (typeof password !== 'string' || password.length < 6) {
     if (avatarFile) {
       safeUnlink(avatarFile.path);
@@ -229,13 +229,13 @@ app.post('/register', upload.single('avatar'), (req: Request, res: Response) => 
     });
   }
 
-  // Hash password
+  // Cifrar la contraseña
   const hashedPassword = bcrypt.hashSync(password, 10);
   
-  // Use uploaded avatar path if provided, otherwise default to avatar placeholder
+  // Usar la ruta del avatar subido si se proporciona, de lo contrario usar el marcador del avatar predeterminado
   const avatarUrl = avatarFile ? `/uploads/${avatarFile.filename}` : '/uploads/default-avatar-1.png';
 
-  // Save user in-memory
+  // Guardar usuario en memoria
   db.createUser({
     name,
     email,
@@ -265,7 +265,7 @@ app.get('/me', authenticateJWT({ missingHeaderStatus: 400 }), (req: Authenticate
     return res.status(404).json({ error: 'user_not_found', message: 'Usuario no encontrado.' });
   }
 
-  // Return user details without password
+  // Retornar detalles de usuario sin contraseña
   const { password, ...safeUser } = user;
   return res.status(200).json(safeUser);
 });
@@ -294,7 +294,7 @@ app.post('/change-password', authenticateJWT({ missingHeaderStatus: 403 }), (req
     return res.status(404).json({ error: 'user_not_found', message: 'Usuario no encontrado.' });
   }
 
-  // Validate old password
+  // Validar la contraseña antigua
   if (!bcrypt.compareSync(oldPassword, user.password)) {
     return res.status(400).json({
       error: 'incorrect_password',
@@ -302,7 +302,7 @@ app.post('/change-password', authenticateJWT({ missingHeaderStatus: 403 }), (req
     });
   }
 
-  // Hash new password and update
+  // Cifrar la nueva contraseña y actualizar
   const newHashedPassword = bcrypt.hashSync(newPassword, 10);
   db.updateUserPassword(userId, newHashedPassword);
 
@@ -317,13 +317,13 @@ app.post('/change-password', authenticateJWT({ missingHeaderStatus: 403 }), (req
 // ==========================================
 // ACCESO SIN CABECERAS DEBE RETORNAR 403
 
-// GET - List comments
+// GET - Listar comentarios
 app.get('/feed', authenticateJWT({ missingHeaderStatus: 403 }), (req: AuthenticatedRequest, res: Response) => {
   const feedComments = db.getComments();
   return res.status(200).json(feedComments);
 });
 
-// POST - Create comment
+// POST - Crear comentario
 app.post('/feed', authenticateJWT({ missingHeaderStatus: 403 }), (req: AuthenticatedRequest, res: Response) => {
   const { content } = req.body;
   const userId = req.user?.userId;
@@ -347,7 +347,7 @@ app.post('/feed', authenticateJWT({ missingHeaderStatus: 403 }), (req: Authentic
     });
   }
 
-  // Broadcast comment to all connected WS clients
+  // Emitir el comentario a todos los clientes WebSocket conectados
   io.emit('new_comment', newComment);
 
   return res.status(200).json({
@@ -379,11 +379,11 @@ app.post('/feed/:id/like', authenticateJWT({ missingHeaderStatus: 403 }), (req: 
   });
 });
 
-// Global error handling middleware (A10:2025 Mitigation)
+// Middleware global de manejo de errores (Mitigación A10:2025)
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error('[SERVER ERROR]:', err);
 
-  // Intercept malformed JSON syntax errors in request bodies
+  // Interceptar errores de sintaxis JSON malformados en los cuerpos de las solicitudes
   if (err instanceof SyntaxError && 'status' in err && err.status === 400 && 'body' in err) {
     return res.status(400).json({
       error: 'bad_request',
@@ -391,12 +391,12 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     });
   }
 
-  // Fallback secure server error (CWE-209 mitigation)
+  // Error de servidor seguro de respaldo (mitigación CWE-209)
   return res.status(500).json({
     error: 'internal_server_error',
     message: 'Ha ocurrido un error inesperado en el servidor.'
   });
 });
 
-// Server started at the top. Everything initialized.
+// Servidor iniciado en la parte superior. Todo inicializado.
 

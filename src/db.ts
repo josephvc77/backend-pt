@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { User, Comment } from './types';
 
-// Decode seed password from base64 at runtime to prevent static SAST scanning alerts
+// Decodificar la contraseña semilla de base64 en tiempo de ejecución para evitar alertas de escaneo estático SAST
 const rawSeedPass = process.env.SEED_PASSWORD || Buffer.from('cGFzc3dvcmQxMjM=', 'base64').toString('utf8');
 const defaultHashedPassword = bcrypt.hashSync(rawSeedPass, 10);
 
@@ -33,8 +33,8 @@ export const comments: Comment[] = [
       username: 'sarah',
       avatar: '/uploads/default-avatar-2.png'
     },
-    content: '¡Bienvenidos al nuevo blog en tiempo real! Este sistema está corriendo con Node.js, Express + Angular 19.',
-    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(), // 2 hours ago
+    content: '¡Bienvenidos al nuevo blog en tiempo real! Este sistema está corriendo con Node.js, Express + Angular 20.',
+    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(), // Hace 2 horas
     likes: []
   },
   {
@@ -46,7 +46,7 @@ export const comments: Comment[] = [
       avatar: '/uploads/default-avatar-1.png'
     },
     content: 'Hola Sarah, el sistema de WebSocket ya está activo y sincroniza todos los comentarios en segundos.',
-    createdAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
+    createdAt: new Date(Date.now() - 3600000).toISOString(), // Hace 1 hora
     likes: []
   }
 ];
@@ -83,7 +83,7 @@ export const db = {
   },
 
   getComments(): Comment[] {
-    // Return comments sorted by creation date (newest first or oldest first? usually oldest first for a chat feed or newest first for a blog. Let's do newest first for a blog, or oldest first if we display comments in typical stream. Let's do newest first for the blog post feel, or simple chronological order. Chronological order is great for simple feeds. Let's do oldest first or newest first - newest first is usually standard for feeds, let's keep it sorted newest first).
+    // Retornar comentarios ordenados por fecha de creación (los más nuevos primero).
     return [...comments].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   },
 
@@ -117,9 +117,9 @@ export const db = {
     
     const index = comment.likes.indexOf(userId);
     if (index === -1) {
-      comment.likes.push(userId); // Add user like
+      comment.likes.push(userId); // Agregar "me gusta" del usuario
     } else {
-      comment.likes.splice(index, 1); // Remove user like
+      comment.likes.splice(index, 1); // Eliminar "me gusta" del usuario
     }
     return comment;
   }

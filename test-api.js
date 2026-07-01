@@ -66,7 +66,7 @@ async function runTests() {
     registerFormData.append('email', 'roberto@example.com');
     registerFormData.append('username', 'roberto');
     registerFormData.append('password', 'password123');
-    // Using a simple 1x1 transparent PNG blob for the profile picture
+    // Usar un blob de PNG transparente simple de 1x1 para la foto de perfil
     const pngBlob = new Blob([Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64')], { type: 'image/png' });
     registerFormData.append('avatar', pngBlob, 'profile.png');
 
@@ -97,7 +97,7 @@ async function runTests() {
 
     // b. Proporcionando datos No válidos (Números en el nombre, correo sin estructura, etc)
     const badRegForm1 = new FormData();
-    badRegForm1.append('name', 'Roberto123'); // Invalid name
+    badRegForm1.append('name', 'Roberto123'); // Nombre no válido
     badRegForm1.append('email', 'roberto@example.com');
     badRegForm1.append('username', 'roberto_bad1');
     badRegForm1.append('password', 'password123');
@@ -111,7 +111,7 @@ async function runTests() {
 
     const badRegForm2 = new FormData();
     badRegForm2.append('name', 'Roberto Gomez');
-    badRegForm2.append('email', 'roberto-sin-arroba.com'); // Invalid email
+    badRegForm2.append('email', 'roberto-sin-arroba.com'); // Correo no válido
     badRegForm2.append('username', 'roberto_bad2');
     badRegForm2.append('password', 'password123');
     badRegForm2.append('avatar', pngBlob, 'profile.png');
@@ -178,7 +178,7 @@ async function runTests() {
     const changePwData = await changePwOk.json();
     console.log('   ↳ Retroalimentación:', changePwData);
 
-    // Revert password back for rest of tests or future logins
+    // Revertir la contraseña para el resto de las pruebas o futuros inicios de sesión
     await fetch(`${BASE_URL}/change-password`, {
       method: 'POST',
       headers: {
@@ -271,7 +271,7 @@ async function runTests() {
   }
 }
 
-// Start backend as child process
+// Iniciar el backend como proceso secundario
 console.log('Iniciando el servidor backend para pruebas...');
 const devServer = spawn('npx', ['ts-node', 'src/index.ts'], {
   cwd: __dirname,
@@ -283,7 +283,7 @@ devServer.stdout.on('data', async (data) => {
   const output = data.toString();
   console.log(`[SERVER]: ${output.trim()}`);
   if (output.includes('Servidor Express corriendo')) {
-    // Wait an additional 500ms to ensure HTTP port binds fully
+    // Esperar 500 ms adicionales para asegurar que el puerto HTTP se vincule por completo
     setTimeout(async () => {
       await runTests();
       console.log('Apagando el servidor...');
@@ -301,7 +301,7 @@ devServer.on('close', (code) => {
   console.log(`Servidor detenido con código: ${code}`);
 });
 
-// Force exit safety fallback
+// Respaldo de seguridad para forzar la salida
 setTimeout(() => {
   console.error('Límite de tiempo de prueba alcanzado (30 segundos). Forzando cierre.');
   devServer.kill();
