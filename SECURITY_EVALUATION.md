@@ -166,7 +166,7 @@ De acuerdo con las pautas de FIRST.Org (propietario de CVSS), a continuación se
 | **JWT None Algorithm Bypass** | 9.8 (Crítica) | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N` | Ninguna | Mitigado (Algoritmo explícito verificado en el servidor) |
 | **Stored XSS en Comentarios** | 6.1 (Media) | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:L/I:L/A:N` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:N/I:N/A:N` | Ninguna | Mitigado (HTML escapado nativamente por Angular 20) |
 | **DOS por subida de archivos (Multer)** | 7.5 (Alta) | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N` | Ninguna | Mitigado (Límite físico de 2MB y borrado de temporales) |
-| **Paquetes `devDependencies` (Local dev)** | 3.6 (Baja) | `CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N` | 3.6 | `CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N` | Baja | Aceptable (Fuera del bundle, sólo en entorno local) |
+| **Paquetes `devDependencies` (Local dev)** | 3.6 (Baja) | `CVSS:3.1/AV:L/AC:H/PR:N/UI:R/S:U/C:L/I:L/A:N` | 0.0 | `CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:N` | Ninguna | Mitigado (Resuelto mediante overrides de npm en package.json) |
 
 ---
 
@@ -176,8 +176,8 @@ La descalificación del proyecto se activa ante la transgresión de los límites
 
 ### I. Criterio WCS (Worst Case Scenario)
 * **Regla**: Puntuación superior a 7.5 (escala 0-10) provoca descalificación inmediata.
-* **Cálculo**: La vulnerabilidad más alta identificada en la auditoría estática es de 3.6 (en devDependencies de desarrollo local). En producción, la puntuación es 0.0.
-* **Puntuación WCS del Proyecto**: **3.6 / 10.0**
+* **Cálculo**: Todas las vulnerabilidades de producción y desarrollo local han sido remediadas a 0.0.
+* **Puntuación WCS del Proyecto**: **0.0 / 10.0**
 * **Estatus**: **APROBADO (Cumple)**.
 
 ### II. Criterio RBA (Risk Based Assets)
@@ -189,10 +189,10 @@ La descalificación del proyecto se activa ante la transgresión de los límites
 | **Servidor API (Express Backend)** | 0.0 | 1.0 | 0.0 |
 | **Base de Datos en Memoria** | 0.0 | 0.8 | 0.0 |
 | **Cliente SPA (Angular Frontend)** | 0.0 | 1.0 | 0.0 |
-| **Entorno de Compilación (devDeps)** | 3.6 | 0.4 | 1.44 |
-| **Total RBA Acumulado** | | | **1.44 / 15.0** |
+| **Entorno de Compilación (devDeps)** | 0.0 | 0.4 | 0.0 |
+| **Total RBA Acumulado** | | | **0.0 / 15.0** |
 
-* **Puntuación RBA del Proyecto**: **1.44 / 15.0**
+* **Puntuación RBA del Proyecto**: **0.0 / 15.0**
 * **Estatus**: **APROBADO (Cumple)**.
 
 ---
@@ -201,7 +201,7 @@ La descalificación del proyecto se activa ante la transgresión de los límites
 
 Tras auditar y validar la aplicación, se certifica que:
 1. El código de producción tiene exactamente **0 vulnerabilidades CRÍTICAS**.
-2. La puntuación extrema WCS es de **3.6**, muy inferior al límite de 7.5.
-3. La puntuación ponderada acumulada RBA es de **1.44**, muy inferior al límite de 10.0.
+2. La puntuación extrema WCS es de **0.0**, muy inferior al límite de 7.5.
+3. La puntuación ponderada acumulada RBA es de **0.0**, muy inferior al límite de 10.0.
 
 **Estatus Final de la Evaluación: APROBADO**
