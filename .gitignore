@@ -1,5 +1,9 @@
 node_modules/
-uploads/
 dist/
 *.log
 .DS_Store
+
+# Ignore dynamic user uploads, but keep default seed avatars
+uploads/*
+!uploads/default-avatar-1.png
+!uploads/default-avatar-2.png
