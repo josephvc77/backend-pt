@@ -9,9 +9,10 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 
 import { db } from './db';
-import { authenticateJWT, JWT_SECRET, AuthenticatedRequest } from './auth.middleware';
+import { authenticateJWT, JWT_SECRET, AuthenticatedRequest, tokenBlacklist } from './auth.middleware';
 
 const app = express();
 
@@ -26,8 +27,9 @@ const server = app.listen(PORT, () => {
 // Configurar Socket.io
 const io = new Server(server, {
   cors: {
-    origin: '*', // Permitir todos por conveniencia, restringir en producción
-    methods: ['GET', 'POST']
+    origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
@@ -91,11 +93,16 @@ const apiLimiter = rateLimit({
 
 // Middleware
 app.use(helmet({ crossOriginResourcePolicy: false }));
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+  origin: ['http://localhost:4200', 'http://127.0.0.1:4200'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/register', apiLimiter);
 app.use('/login', apiLimiter);
+app.use('/logout', apiLimiter);
 
 
 // Servir archivos estáticos subidos
@@ -138,10 +145,48 @@ app.post('/login', (req: Request, res: Response) => {
   const expirationSeconds = 3600; // 1 hora
   const token = jwt.sign(tokenPayload, JWT_SECRET, { expiresIn: expirationSeconds });
 
+  // Establecer el token de sesión en una Cookie segura y HttpOnly
+  res.cookie('access_token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: expirationSeconds * 1000
+  });
+
   return res.status(200).json({
     token_type: 'Bearer',
-    expiration: expirationSeconds,
-    access_token: token
+    expiration: expirationSeconds
+  });
+});
+
+// ==========================================
+// 1b. ENDPOINT: /logout
+// ==========================================
+app.post('/logout', (req: Request, res: Response) => {
+  // Extraer token de la cookie o de la cabecera Authorization (para pruebas)
+  let token = req.cookies.access_token;
+  if (!token && req.headers.authorization) {
+    const parts = req.headers.authorization.split(' ');
+    if (parts.length === 2 && parts[0] === 'Bearer') {
+      token = parts[1];
+    }
+  }
+
+  // Registrar el token en la lista negra de revocación
+  if (token) {
+    tokenBlacklist.add(token);
+  }
+
+  // Limpiar la cookie de sesión del cliente
+  res.clearCookie('access_token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  });
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Sesión cerrada exitosamente.'
   });
 });
 

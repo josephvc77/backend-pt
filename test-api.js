@@ -32,11 +32,19 @@ async function runTests() {
     });
     assertStatus('/login - Credenciales correctas', loginOk, 200);
     const loginData = await loginOk.json();
-    if (loginData.access_token && loginData.token_type === 'Bearer' && loginData.expiration) {
-      console.log('   ↳ Estructura de respuesta correcta (access_token, token_type, expiration)');
-      token = loginData.access_token;
+    const cookieHeader = loginOk.headers.get('set-cookie');
+    let extractedToken = '';
+    if (cookieHeader) {
+      const match = cookieHeader.match(/access_token=([^;]+)/);
+      if (match) {
+        extractedToken = match[1];
+      }
+    }
+    if (extractedToken && loginData.token_type === 'Bearer' && loginData.expiration) {
+      console.log('   ↳ Estructura de respuesta correcta (Cookie HttpOnly, token_type, expiration)');
+      token = extractedToken;
     } else {
-      console.error('   ↳ Estructura de respuesta INCORRECTA:', loginData);
+      console.error('   ↳ Estructura de respuesta INCORRECTA:', loginData, 'Cookie:', cookieHeader);
     }
 
     // b. Acceso proporcionando credenciales erroneas

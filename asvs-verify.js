@@ -56,7 +56,14 @@ async function runAsvsSuite() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: 'joseph', password: 'password123' })
     });
-    const { access_token } = await loginRes.json();
+    const cookieHeader = loginRes.headers.get('set-cookie');
+    let access_token = '';
+    if (cookieHeader) {
+      const match = cookieHeader.match(/access_token=([^;]+)/);
+      if (match) {
+        access_token = match[1];
+      }
+    }
     let tokenOk = false;
     let jwtDetails = '';
     if (access_token) {

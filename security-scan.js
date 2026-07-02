@@ -45,7 +45,14 @@ async function runSecurityTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username: 'joseph', password: 'password123' })
     });
-    const { access_token } = await loginOk.json();
+    const cookieHeader = loginOk.headers.get('set-cookie');
+    let access_token = '';
+    if (cookieHeader) {
+      const match = cookieHeader.match(/access_token=([^;]+)/);
+      if (match) {
+        access_token = match[1];
+      }
+    }
     
     // Modificar la parte de la firma del JWT (tercera parte)
     const tokenParts = access_token.split('.');
@@ -115,6 +122,27 @@ async function runSecurityTests() {
       console.error(' [ERROR] Falló el guardado del comentario XSS:', postXssRes.status);
       testOk = false;
     }
+
+    // -------------------------------------------------------------
+    // TEST 7: Revocación de Token tras Cierre de Sesión (Session Revocation)
+    // -------------------------------------------------------------
+    console.log('TEST 7: Revocación de Token tras Cierre de Sesión');
+    let logoutRes = await fetch(`${BASE_URL}/logout`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${access_token}` }
+    });
+    if (logoutRes.status === 200) {
+      console.log(' [INFO] Logout exitoso ejecutado en el servidor.');
+    } else {
+      console.error(' [ERROR] Falló la llamada a /logout en el servidor:', logoutRes.status);
+      testOk = false;
+    }
+
+    let afterLogoutRes = await fetch(`${BASE_URL}/me`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${access_token}` }
+    });
+    assertBlocked('Uso de token después del logout en /me', afterLogoutRes, 401);
 
     console.log('\n=============================================================');
     if (testOk) {
